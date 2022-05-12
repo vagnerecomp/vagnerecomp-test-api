@@ -54,4 +54,44 @@ router.get('/:id', async (req, res)=>{
 })
 
 
+router.patch('/:id', async (req, res)=>{
+    const id = req.params.id;
+
+    try {
+        const {nome, carne, pao, status, opcionais} = req.body;
+        const burger = {
+            nome,
+            carne,
+            pao,
+            status,
+            opcionais
+        };
+        
+        const updatedBurger = await Burger.updateOne({_id: id}, burger);
+        if(updatedBurger.matchedCount === 0){
+            res.status(422).json({message: "Burger not found"})
+            return;
+        }
+        res.status(200).json({message: "Burger Updated"});
+    } catch (error) {
+        res.status(500).json({error: error});
+    }
+})
+
+router.delete("/:id", async (req, res)=>{
+    const id = req.params.id;
+    const burger = await Burger.findOne({_id: id})
+    if (!burger){
+        // (await Burger.findOne({_id: id}))
+        res.status(422).json({message: "Burger not found"});
+        return;
+    }
+    try {
+        await Burger.deleteOne({_id: id});
+        res.status(200).json({message: "Burger removed successful"});
+    } catch (error) {
+        res.status(500).json({error:error});
+    }
+})
+
 module.exports = router;
